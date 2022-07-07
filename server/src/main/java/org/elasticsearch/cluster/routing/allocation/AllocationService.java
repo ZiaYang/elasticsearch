@@ -65,6 +65,10 @@ import static org.elasticsearch.cluster.routing.UnassignedInfo.INDEX_DELAYED_NOD
  * {@link AllocationService} keeps {@link AllocationDeciders} to choose nodes
  * for shard allocation. This class also manages new nodes joining the cluster
  * and rerouting of shards.
+ *
+ * 该服务管理集群的节点分配。
+ * 出于这个原因，{@link AllocationService} 保留 {@link AllocationDeciders} 来选择用于分片分配的节点。
+ * 此类还管理加入集群的新节点和分片的重新路由。
  */
 public class AllocationService {
 
@@ -352,6 +356,9 @@ public class AllocationService {
 
     /**
      * Removes delay markers from unassigned shards based on current time stamp.
+     *
+     * 根据当前时间戳从未分配的分片中删除延迟标记。
+     *
      */
     private void removeDelayMarkers(RoutingAllocation allocation) {
         final RoutingNodes.UnassignedShards.UnassignedIterator unassignedIterator = allocation.routingNodes().unassigned().iterator();
@@ -389,6 +396,7 @@ public class AllocationService {
 
     /**
      * Reset failed allocation counter for unassigned shards
+     * 为未分配的分片重置失败的分配计数器
      */
     private void resetFailedAllocationCounter(RoutingAllocation allocation) {
         final RoutingNodes.UnassignedShards.UnassignedIterator unassignedIterator = allocation.routingNodes().unassigned().iterator();
@@ -438,11 +446,21 @@ public class AllocationService {
         }
     }
 
+    /**
+     * 手动命令
+     *
+     * @param clusterState
+     * @param commands
+     * @param explain
+     * @param retryFailed
+     * @return
+     */
     public CommandsResult reroute(final ClusterState clusterState, AllocationCommands commands, boolean explain, boolean retryFailed) {
         RoutingNodes routingNodes = getMutableRoutingNodes(clusterState);
         // we don't shuffle the unassigned shards here, to try and get as close as possible to
         // a consistent result of the effect the commands have on the routing
         // this allows systems to dry run the commands, see the resulting cluster state, and act on it
+        // 我们不会在这里打乱未分配的分片，以尝试尽可能接近命令对路由的影响的一致结果，这允许系统空运行命令，查看生成的集群状态并对其采取行动
         RoutingAllocation allocation = new RoutingAllocation(
             allocationDeciders,
             routingNodes,
@@ -451,33 +469,47 @@ public class AllocationService {
             snapshotsInfoService.snapshotShardSizes(),
             currentNanoTime()
         );
-        // don't short circuit deciders, we want a full explanation
+        // don't short circuit deciders, we want a full explanation 不要短路决策者，我们想要一个完整的解释
         allocation.debugDecision(true);
-        // we ignore disable allocation, because commands are explicit
+        // we ignore disable allocation, because commands are explicit 我们忽略禁用分配，因为命令是显式的
         allocation.ignoreDisable(true);
 
         if (retryFailed) {
+            //失败重试，重置分配失败计数器
             resetFailedAllocationCounter(allocation);
         }
 
         RoutingExplanations explanations = commands.execute(allocation, explain);
         // we revert the ignore disable flag, since when rerouting, we want the original setting to take place
+        // 我们恢复了忽略禁用标志，因为在重新路由时，我们希望原始设置发生
         allocation.ignoreDisable(false);
         // the assumption is that commands will move / act on shards (or fail through exceptions)
         // so, there will always be shard "movements", so no need to check on reroute
+        // 假设命令将在分片上移动（或因异常而失败），因此，总是会有分片“移动”，因此无需检查重新路由
         reroute(allocation);
         return new CommandsResult(explanations, buildResultAndLogHealthChange(clusterState, allocation, "reroute commands"));
     }
 
     /**
+     * 内部模块调用reroute，返回集群状态。
+     *
      * Computes the next step towards a fully allocated and balanced cluster and records this step in the routing table of the returned
      * state. Should be called after every change to the cluster that affects the routing table and/or the balance of shards.
+     *
+     * 计算迈向完全分配和平衡集群的下一步，并将此步骤记录在返回状态的路由表中。应该在每次更改影响路由表和/或分片平衡的集群后调用。
+     *
      * <p>
      * This method is expensive in larger clusters. Wherever possible you should invoke this method asynchronously using
      * {@link RerouteService#reroute} to batch up invocations rather than calling the method directly. The node's reroute service is
      * typically obtained from {@link ClusterService#getRerouteService}.
      *
+     * 这种方法在较大的集群中成本很高。
+     * 只要有可能，您应该使用 {@link RerouteService#reroute} 异步调用此方法来批量调用，而不是直接调用该方法。
+     * 节点的重路由服务通常从 {@link ClusterService#getRerouteService} 获得。
+     *
+     *
      * @return an updated cluster state, or the same instance that was passed as an argument if no changes were made.
+     * 返回一个已更新的集群状态，或者如果没有进行任何更改，则作为参数传递的同一实例。
      */
     public ClusterState reroute(ClusterState clusterState, String reason) {
         ClusterState fixedClusterState = adaptAutoExpandReplicas(clusterState);
@@ -562,8 +594,10 @@ public class AllocationService {
             : "auto-expand replicas out of sync with number of nodes in the cluster";
         assert assertInitialized();
 
+        //删除延迟标记
         removeDelayMarkers(allocation);
 
+        //尝试先分配现有的分片副本
         allocateExistingUnassignedShards(allocation);  // try to allocate existing shard copies first
         shardsAllocator.allocate(allocation);
         assert RoutingNodes.assertShardStats(allocation.routingNodes());
@@ -657,6 +691,8 @@ public class AllocationService {
 
     /**
      * Create a mutable {@link RoutingNodes}. This is a costly operation so this must only be called once!
+     * 创建一个可变的 {@link RoutingNodes}。这是一项代价高昂的操作，因此只能调用一次！
+     *
      */
     private static RoutingNodes getMutableRoutingNodes(ClusterState clusterState) {
         return clusterState.mutableRoutingNodes();

@@ -29,6 +29,12 @@ public interface ShardsAllocator {
      * - relocate shards that cannot stay on a node anymore
      * - relocate shards to find a good shard balance in the cluster
      *
+     * 将分片分配给集群中的节点。此方法的实现应该：
+     * - 分配尚未分配的分片
+     * - 迁移不能继续留在节点上的分片
+     * - 迁移分片，以继续保持集群中的分片平衡
+     *
+     *
      * @param allocation current node allocation
      */
     void allocate(RoutingAllocation allocation);
@@ -37,6 +43,11 @@ public interface ShardsAllocator {
      * Returns the decision for where a shard should reside in the cluster.  If the shard is unassigned,
      * then the {@link AllocateUnassignedDecision} will be non-null.  If the shard is not in the unassigned
      * state, then the {@link MoveDecision} will be non-null.
+     *
+     * 返回分片应驻留在集群中的位置的决定。
+     * 如果分片未分配，则 {@link AllocateUnassignedDecision} 将为非空。
+     * 如果分片已分配过，则 {@link MoveDecision} 将为非空。
+     *
      *
      * This method is primarily used by the cluster allocation explain API to provide detailed explanations
      * for the allocation of a single shard.  Implementations of the {@link #allocate(RoutingAllocation)} method

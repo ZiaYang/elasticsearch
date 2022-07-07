@@ -51,6 +51,9 @@ import static org.elasticsearch.core.Strings.format;
  * (see {@link org.elasticsearch.cluster.routing.allocation.allocator.BalancedShardsAllocator}),
  * nor does it allocate primaries when a primary shard failed and there is a valid replica
  * copy that can immediately be promoted to primary, as this takes place in {@link RoutingNodes#failShard}.
+ *
+ * 找到那些拥有某分片最新数据的节点
+ *
  */
 public abstract class PrimaryShardAllocator extends BaseGatewayShardAllocator {
     /**

@@ -50,6 +50,8 @@ import java.util.stream.Collectors;
  * (see {@link RoutingNodes#mutable(RoutingTable, DiscoveryNodes)}, {@link RoutingNodes#immutable(RoutingTable, DiscoveryNodes)},
  * and {@link #mutableCopy()})
  *
+ * RoutingNodes代表包含在ClusterState集群状态的路由信息的副本
+ *
  * The main methods used to update routing entries are:
  * <ul>
  * <li> {@link #initializeShard} initializes an unassigned shard.

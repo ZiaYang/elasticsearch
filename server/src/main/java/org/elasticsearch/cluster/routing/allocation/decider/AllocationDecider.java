@@ -19,12 +19,17 @@ import org.elasticsearch.cluster.routing.allocation.decider.Decision.Type;
  * {@link AllocationDecider} is an abstract base class that allows to make
  * dynamic cluster- or index-wide shard allocation decisions on a per-node
  * basis.
+ *
+ * {@link AllocationDecider} 是一个抽象基类，它允许在每个节点的基础上做出动态集群或索引范围的分片分配决策。
+ *
  */
 public abstract class AllocationDecider {
     /**
      * Returns a {@link Decision} whether the given shard routing can be
      * re-balanced to the given allocation. The default is
      * {@link Decision#ALWAYS}.
+     *
+     * 给定分片是否可以Rebalanced到给定allocation。 默认返回 可以。
      */
     public Decision canRebalance(ShardRouting shardRouting, RoutingAllocation allocation) {
         return Decision.ALWAYS;
@@ -33,6 +38,8 @@ public abstract class AllocationDecider {
     /**
      * Returns a {@link Decision} whether the given shard routing can be
      * allocated on the given node. The default is {@link Decision#ALWAYS}.
+     * 给定分片是否可以分配到给定节点
+     *
      */
     public Decision canAllocate(ShardRouting shardRouting, RoutingNode node, RoutingAllocation allocation) {
         return Decision.ALWAYS;
@@ -41,6 +48,7 @@ public abstract class AllocationDecider {
     /**
      * Returns a {@link Decision} whether the given shard routing can be remain
      * on the given node. The default is {@link Decision#ALWAYS}.
+     * 给定分片是否可以留在给定节点
      */
     public Decision canRemain(ShardRouting shardRouting, RoutingNode node, RoutingAllocation allocation) {
         return Decision.ALWAYS;
@@ -88,6 +96,8 @@ public abstract class AllocationDecider {
      * the results of {@link #canAllocate(ShardRouting, RoutingNode, RoutingAllocation)}
      * before making a decision on force allocation, because force allocation should only
      * be considered if all deciders return {@link Decision#NO}.
+     *
+     * 给定主分片是否可以强制分配到给定节点
      */
     public Decision canForceAllocatePrimary(ShardRouting shardRouting, RoutingNode node, RoutingAllocation allocation) {
         assert shardRouting.primary() : "must not call canForceAllocatePrimary on a non-primary shard " + shardRouting;

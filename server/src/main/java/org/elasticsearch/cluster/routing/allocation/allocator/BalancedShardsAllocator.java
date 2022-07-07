@@ -67,6 +67,8 @@ import static org.elasticsearch.cluster.routing.ShardRoutingState.RELOCATING;
  * <p>
  * These parameters are combined in a {@link WeightFunction} that allows calculation of node weights which
  * are used to re-balance shards based on global as well as per-index factors.
+ *
+ * 找到拥有最少分片个数的节点
  */
 public class BalancedShardsAllocator implements ShardsAllocator {
 
@@ -124,8 +126,11 @@ public class BalancedShardsAllocator implements ShardsAllocator {
             return;
         }
         final Balancer balancer = new Balancer(logger, allocation, weightFunction, threshold);
+        //分配尚未分配的分片
         balancer.allocateUnassigned();
+        //移动分片
         balancer.moveShards();
+        //平衡分片
         balancer.balance();
     }
 

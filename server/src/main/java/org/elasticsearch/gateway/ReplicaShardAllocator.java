@@ -40,6 +40,9 @@ import java.util.Set;
 
 import static org.elasticsearch.cluster.routing.UnassignedInfo.INDEX_DELAYED_NODE_LEFT_TIMEOUT_SETTING;
 
+/**
+ * 找到磁盘上拥有这个分片数据的节点
+ */
 public abstract class ReplicaShardAllocator extends BaseGatewayShardAllocator {
     /**
      * Process existing recoveries of replicas and see if we need to cancel them if we find a better

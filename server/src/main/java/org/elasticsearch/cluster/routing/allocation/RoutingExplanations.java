@@ -22,6 +22,9 @@ import java.util.Optional;
 /**
  * Class used to encapsulate a number of {@link RerouteExplanation}
  * explanations.
+ *
+ * 用于封装许多 {@link Reroute Explanation} 解释的类。
+ *
  */
 public class RoutingExplanations implements ToXContentFragment {
     private final List<RerouteExplanation> explanations;

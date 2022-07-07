@@ -86,6 +86,9 @@ import java.util.function.Supplier;
 
 /**
  * Configures classes and services that affect the entire cluster.
+ *
+ * 配置影响整个集群的类和服务。
+ *
  */
 public class ClusterModule extends AbstractModule {
 
@@ -277,7 +280,11 @@ public class ClusterModule extends AbstractModule {
     }
 
     // TODO: this is public so allocation benchmark can access the default deciders...can we do that in another way?
-    /** Return a new {@link AllocationDecider} instance with builtin deciders as well as those from plugins. */
+    /**
+     * Return a new {@link AllocationDecider} instance with builtin deciders as well as those from plugins.
+     *
+     * 创建一个AllocationDeciders对象集合，其中包含内置决策器以及来自插件的决策器。
+     * */
     public static Collection<AllocationDecider> createAllocationDeciders(
         Settings settings,
         ClusterSettings clusterSettings,
